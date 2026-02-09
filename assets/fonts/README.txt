@@ -1,0 +1,1 @@
+Place PPFragment-Regular.woff2 and PPFragment-Bold.woff2 here to use the PP Fragment font across the site.
