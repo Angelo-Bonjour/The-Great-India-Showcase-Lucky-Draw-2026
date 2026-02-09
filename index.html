@@ -19,7 +19,7 @@
     --shadow: rgba(0,0,0,0.35);
     --logo-top-width: 160px;
     --logo-end-width: 240px;
-    --bow-width: 360px; /* bow PNG display width */
+    --bow-width: 360px; 
   }
   *{box-sizing:border-box}
   @font-face{font-family:'PP Fragment';src:url('assets/fonts/PPFragment-Regular.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap}
@@ -43,7 +43,6 @@
   .box-base{position:absolute;inset:140px 0 0 0;margin:auto;width:100%;height:calc(100% - 140px);background:linear-gradient(145deg,var(--gift-base) 0%,var(--gift-shade) 100%);border-radius:14px;border:4px solid #fff;overflow:hidden;box-shadow:0 16px 40px var(--shadow),inset 0 0 0 2px rgba(255,255,255,.2);z-index:1}
   .lid-wrap{position:absolute;width:100%;left:0;right:0;top:0;height:150px;pointer-events:none;z-index:5}
   .lid{position:absolute;width:calc(100% + 16px);height:120px;left:50%;transform:translateX(-50%);top:20px;border-radius:12px;border:4px solid #fff;background:linear-gradient(145deg,var(--lid-base) 0%,var(--lid-shade) 100%);box-shadow:0 10px 20px var(--shadow);transform-origin:center bottom}
-  /* Bow as external PNG (centered on lid; moves with it) */
   #bowPng{position:absolute;left:50%;transform:translateX(-50%);top:-6px;width:var(--bow-width);height:auto;pointer-events:none}
 
   .lid-fly{animation:flyOff 1.1s ease-out forwards}
@@ -76,7 +75,6 @@
   .drawer .row{display:flex;align-items:center;justify-content:space-between}
   .drawer label{font-weight:700}
 
-  /* Lucky Ones */
   #luckyOverlay .modal{width:min(96vw,820px)}
   .searchbar{display:flex;gap:8px;margin-bottom:10px}
   .searchbar input{flex:1;padding:10px 12px;border:1px solid #ccc;border-radius:10px;font-size:14px}
@@ -90,9 +88,7 @@
   .lucky-selected{margin:8px 0 12px;padding:10px;border-radius:10px;background:#fff;border:1px solid #eee}
   .lucky-selected strong{display:inline-block;margin-right:8px}
 
-  /* Logos */
   #logoTopAbs{position:absolute;left:22px;width:var(--logo-top-width);height:auto;z-index:300}
-  /* End logo: JS positions it 15px below box; keep centered */
   #logoEndWrap{position:absolute;left:50%;transform:translateX(-50%);top:0;z-index:50;pointer-events:none}
   #logoEnd{width:var(--logo-end-width);height:auto;pointer-events:auto}
 </style>
@@ -150,7 +146,6 @@
 
 <script>
 (function(){
-  // --- Logo placements ---
   function placeLogoTop(){
     const header = document.getElementById('pageHeader');
     const logo = document.getElementById('logoTopAbs');
@@ -160,12 +155,12 @@
     logo.style.left = '22px';
   }
   function placeLogoEnd(){
-  const gift = document.querySelector('.gift');
-  const wrap = document.getElementById('logoEndWrap');
-  if(!gift || !wrap) return;
-  const r = gift.getBoundingClientRect();
-  wrap.style.top = (r.bottom + window.scrollY + 5) + 'px'; 
-}
+    const gift = document.querySelector('.gift');
+    const wrap = document.getElementById('logoEndWrap');
+    if(!gift || !wrap) return;
+    const r = gift.getBoundingClientRect();
+    wrap.style.top = (r.bottom + window.scrollY + 5) + 'px'; 
+  }
   function placeAll(){ placeLogoTop(); placeLogoEnd(); }
 
   window.addEventListener('load', placeAll);
@@ -174,7 +169,6 @@
   document.addEventListener('fullscreenchange', placeAll);
   document.addEventListener('webkitfullscreenchange', placeAll);
 
-  // --- Elements ---
   const entriesEl = document.getElementById('entries');
   const lidEl = document.getElementById('lid');
   const bowImg = document.getElementById('bowPng');
@@ -195,7 +189,6 @@
   const drawerMask = document.getElementById('drawerMask');
   const closeDrawer = document.getElementById('closeDrawer');
   
-  // Modal Elements
   const winnerOverlay = document.getElementById('winnerOverlay');
   const closeWinner = document.getElementById('closeWinner');
   const winnerNameEl = document.getElementById('winnerName');
@@ -218,7 +211,6 @@
   const clap = document.getElementById('clap');
   drum.volume = .9; pop.volume = .7; clap.volume = .7;
 
-  // --- Modal Close Handlers ---
   const closeAllOverlays = () => {
     winnerOverlay.style.display = 'none';
     winnersOverlay.style.display = 'none';
@@ -226,26 +218,29 @@
     closeDrawerFn();
   };
 
-  closeWinner.addEventListener('click', () => winnerOverlay.style.display = 'none');
+  closeWinner.addEventListener('click', () => { 
+    winnerOverlay.style.display = 'none';
+    // Trigger the lid closing animation
+    lidEl.classList.remove('lid-fly');
+    void lidEl.offsetWidth; // Force reflow
+    lidEl.classList.add('lid-return');
+  });
+
   closeWinners.addEventListener('click', () => winnersOverlay.style.display = 'none');
   closeLucky.addEventListener('click', () => luckyOverlay.style.display = 'none');
 
-  // Handle Escape Key to close any open modal
   window.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') closeAllOverlays();
   });
 
-  // Optional: hide bow if missing
   if(bowImg){ bowImg.addEventListener('error', ()=>{ bowImg.style.display='none'; }); }
 
-  // --- Fullscreen ---
   function isFS(){ return !!(document.fullscreenElement || document.webkitFullscreenElement); }
   function enterFS(){ const el=document.documentElement; if(el.requestFullscreen) el.requestFullscreen(); else if(el.webkitRequestFullscreen) el.webkitRequestFullscreen(); }
   btnFullscreen.addEventListener('click', ()=>{ if(!isFS()) enterFS(); });
   document.addEventListener('fullscreenchange', ()=>{ btnFullscreen.style.display = isFS()? 'none' : 'grid'; });
   document.addEventListener('webkitfullscreenchange', ()=>{ btnFullscreen.style.display = isFS()? 'none' : 'grid'; });
 
-  // --- Config ---
   const DEFAULT_SHEET_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR9EzQVA4kCkKxyzpQ2S61wrHce8ohaH7v_QvgPzfLqNMkghG3O-_JGYQBVcUmE0-Y-vsKio3pnTeh5/pub?output=csv";
   const DRAW_COUNTDOWN_SEC=3, DRAW_PHASE_MS=5000, AUTO_REFRESH_MS=10000, BLINK_MS=1200;
 
@@ -258,7 +253,33 @@
 
   function renderEntries(){ if(!activePool.length){ entriesEl.textContent='No participants available.'; return; } entriesEl.innerHTML = activePool.map(p=>{ const m=p.match(/^(.*) \((.*)\)$/); const name=m?m[1]:p; const company=m?m[2]:''; return `<div class=\"entry\"><span class=\"name\">${escapeHtml(name)}</span><span class=\"company\">${escapeHtml(company)}</span></div>`; }).join(''); }
 
-  async function refreshParticipants(){ try{ const res=await fetch(getCsvUrl(),{cache:'no-store'}); if(!res.ok) throw new Error('Network'); const csv=await res.text(); const parsed=Papa.parse(csv,{header:true,skipEmptyLines:true}); const rows=parsed.data; const toKey=s=>String(s||'').trim().toLowerCase(); const mapped=rows.map(r=>{ const o={}; Object.keys(r).forEach(k=>o[toKey(k)]=r[k]); const full=(o['full name']||o['fullname']||o['name']||'').toString().trim(); const comp=(o['name of company']||o['company']||'').toString().trim(); return {full,comp}; }).filter(x=>x.full&&x.comp); participants=mapped.map(x=>`${x.full} (${x.comp})`); const seen=new Set(); participants=participants.filter(p=>seen.has(p)?false:(seen.add(p),true)); activePool=participants.filter(p=>!winners.includes(p)); luckyQueue=luckyQueue.filter(p=>activePool.includes(p)).slice(0,3); renderEntries(); startIdleShuffle(); placeAll(); }catch(e){ console.error(e); entriesEl.textContent='Unable to load participants.'; }
+  async function refreshParticipants(){ 
+    try{ 
+      const res=await fetch(getCsvUrl(),{cache:'no-store'}); 
+      if(!res.ok) throw new Error('Network'); 
+      const csv=await res.text(); 
+      const parsed=Papa.parse(csv,{header:true,skipEmptyLines:true}); 
+      const rows=parsed.data; 
+      const toKey=s=>String(s||'').trim().toLowerCase(); 
+      const mapped=rows.map(r=>{ 
+        const o={}; 
+        Object.keys(r).forEach(k=>o[toKey(k)]=r[k]); 
+        const full=(o['full name']||o['fullname']||o['name']||'').toString().trim(); 
+        const comp=(o['name of company']||o['company']||'').toString().trim(); 
+        return {full,comp}; 
+      }).filter(x=>x.full&&x.comp); 
+      participants=mapped.map(x=>`${x.full} (${x.comp})`); 
+      const seen=new Set(); 
+      participants=participants.filter(p=>seen.has(p)?false:(seen.add(p),true)); 
+      activePool=participants.filter(p=>!winners.includes(p)); 
+      luckyQueue=luckyQueue.filter(p=>activePool.includes(p)).slice(0,3); 
+      renderEntries(); 
+      startIdleShuffle(); 
+      placeAll(); 
+    } catch(e){ 
+      console.error(e); 
+      entriesEl.textContent='Unable to load participants.'; 
+    }
   }
 
   function startIdleShuffle(){ stopIdleShuffle(); idleShuffleTimer=setInterval(()=>{ if(drawing||activePool.length<2) return; for(let i=activePool.length-1;i>0;i--){ if(Math.random()<0.25){ const j=Math.floor(Math.random()*(i+1)); [activePool[i],activePool[j]]=[activePool[j],activePool[i]]; } } renderEntries(); }, BLINK_MS); }
@@ -271,9 +292,15 @@
   function randomizePositions(items){ const b=entriesEl.getBoundingClientRect(); items.forEach(el=>{ const r=el.getBoundingClientRect(); const w=r.width||190, h=r.height||68; const pad=6; const maxX=Math.max(0,b.width-w-pad); const maxY=Math.max(0,b.height-h-pad); const x=Math.floor(Math.random()*maxX)+pad/2; const y=Math.floor(Math.random()*maxY)+pad/2; const rot=(Math.random()*10-5); const scale=1+(Math.random()*0.08); el.style.left=x+'px'; el.style.top=y+'px'; el.style.transform=`rotate(${rot}deg) scale(${scale})`; }); }
   function stopFreeMove(){ clearInterval(moveTimer); moveTimer=null; entriesEl.classList.remove('free'); [...entriesEl.children].forEach(el=>{ el.style.left=''; el.style.top=''; el.style.transform='none'; }); startIdleShuffle(); }
 
-  async function startDraw(){ if(drawing) return; if(!activePool.length){ alert('No participants left!'); return; } drawing=true; disableControls(true);
+  async function startDraw(){ 
+    if(drawing) return; 
+    if(!activePool.length){ alert('No participants left!'); return; } 
+    drawing=true; 
+    disableControls(true);
     await countdown(DRAW_COUNTDOWN_SEC);
-    lidEl.classList.remove('lid-fly','lid-return'); void lidEl.offsetWidth; lidEl.classList.add('lid-fly');
+    lidEl.classList.remove('lid-fly','lid-return'); 
+    void lidEl.offsetWidth; 
+    lidEl.classList.add('lid-fly');
     try{ drum.currentTime=0; await drum.play(); }catch(e){}
     phaseLabel.textContent='Drawing…'; countText.textContent='';
     startFreeMove();
@@ -320,11 +347,9 @@
   btnLucky.addEventListener('click', ()=>{ luckyOverlay.style.display='grid'; renderLuckyList(); updateLuckySelected(); closeDrawerFn(); });
   luckySearch.addEventListener('input', renderLuckyList); luckyRefresh.addEventListener('click', renderLuckyList); btnClearRig.addEventListener('click', clearRig);
 
-  // Recompute end logo after typical layout-affecting events
   const reflowEvents=['click','transitionend','animationend'];
   reflowEvents.forEach(evt=>document.addEventListener(evt,()=>{ requestAnimationFrame(()=>requestAnimationFrame(placeAll)); }));
 
-  // Initial
   refreshParticipants();
 })();
 </script>
