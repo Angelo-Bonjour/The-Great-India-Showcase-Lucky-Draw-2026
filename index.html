@@ -58,7 +58,7 @@
   @keyframes blink{0%,100%{opacity:1}50%{opacity:.45}}
   .free .entry{position:absolute;width:190px}
 
-  .overlay{position:fixed;inset:0;display:none;place-items:center;background:rgba(0,0,0,.35);z-index:100;backdrop-filter:blur(1px)}
+  .overlay{position:fixed;inset:0;display:none;place-items:center;background:rgba(0,0,0,0.35);z-index:100;backdrop-filter:blur(1px)}
   .modal{background:#fff;color:#111;width:min(92vw,720px);border-radius:14px;box-shadow:0 24px 60px rgba(0,0,0,.45);position:relative}
   .modal .head{padding:14px 18px;border-bottom:1px solid #eee;font-weight:800;display:flex;align-items:center;justify-content:space-between}
   .modal .body{padding:16px 18px;max-height:70vh;overflow:auto}
@@ -184,6 +184,7 @@
   const btnRefresh = document.getElementById('btnRefresh');
   const btnStart = document.getElementById('btnStart');
   const btnReset = document.getElementById('btnReset');
+  const btnExportWinners = document.getElementById('btnExportWinners');
   const chkAuto = document.getElementById('autoRefresh');
   const btnSound = document.getElementById('btnSound');
   const btnWinners = document.getElementById('btnWinners');
@@ -193,14 +194,19 @@
   const drawer = document.getElementById('drawer');
   const drawerMask = document.getElementById('drawerMask');
   const closeDrawer = document.getElementById('closeDrawer');
+  
+  // Modal Elements
   const winnerOverlay = document.getElementById('winnerOverlay');
   const closeWinner = document.getElementById('closeWinner');
   const winnerNameEl = document.getElementById('winnerName');
   const winnerCompanyEl = document.getElementById('winnerCompany');
+  
   const winnersOverlay = document.getElementById('winnersOverlay');
   const closeWinners = document.getElementById('closeWinners');
   const winnersListEl = document.getElementById('winnersList');
+  
   const luckyOverlay = document.getElementById('luckyOverlay');
+  const closeLucky = document.getElementById('closeLucky');
   const luckyGrid = document.getElementById('luckyGrid');
   const luckySelected = document.getElementById('luckySelected');
   const luckySearch = document.getElementById('luckySearch');
@@ -211,6 +217,23 @@
   const pop = document.getElementById('pop');
   const clap = document.getElementById('clap');
   drum.volume = .9; pop.volume = .7; clap.volume = .7;
+
+  // --- Modal Close Handlers ---
+  const closeAllOverlays = () => {
+    winnerOverlay.style.display = 'none';
+    winnersOverlay.style.display = 'none';
+    luckyOverlay.style.display = 'none';
+    closeDrawerFn();
+  };
+
+  closeWinner.addEventListener('click', () => winnerOverlay.style.display = 'none');
+  closeWinners.addEventListener('click', () => winnersOverlay.style.display = 'none');
+  closeLucky.addEventListener('click', () => luckyOverlay.style.display = 'none');
+
+  // Handle Escape Key to close any open modal
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeAllOverlays();
+  });
 
   // Optional: hide bow if missing
   if(bowImg){ bowImg.addEventListener('error', ()=>{ bowImg.style.display='none'; }); }
@@ -291,6 +314,7 @@
   btnRefresh.addEventListener('click', refreshParticipants);
   btnStart.addEventListener('click', startDraw);
   if(btnReset) btnReset.addEventListener('click', ()=>{ resetDraw(); renderWinners(); });
+  if(btnExportWinners) btnExportWinners.addEventListener('click', downloadWinnersCSV);
   chkAuto.addEventListener('change', toggleAuto);
   btnSound.addEventListener('click', primeAudio);
   btnLucky.addEventListener('click', ()=>{ luckyOverlay.style.display='grid'; renderLuckyList(); updateLuckySelected(); closeDrawerFn(); });
