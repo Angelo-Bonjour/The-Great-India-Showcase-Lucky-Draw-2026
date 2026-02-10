@@ -20,7 +20,7 @@
     --shadow: rgba(0,0,0,0.35);
     --logo-top-width: 160px;
     --logo-end-width: 240px;
-    --bow-width: 360px; /* bow PNG display width */
+    --bow-width: 220px; /* bow PNG display width */
   }
   *{box-sizing:border-box}
   @font-face{font-family:'PP Fragment';src:url('assets/fonts/PPFragment-Regular.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap}
@@ -168,7 +168,7 @@
     const wrap = document.getElementById('logoEndWrap');
     if(!gift || !wrap) return;
     const r = gift.getBoundingClientRect();
-    const below = r.bottom + window.scrollY + 0; // 0px below box
+    const below = r.bottom + window.scrollY + 5; // 5px below box
     wrap.style.top = below + 'px';
   }
   function placeAll(){ placeLogoTop(); placeLogoEnd(); }
